@@ -17,7 +17,7 @@ export default function AdminDashboard({ initialBlockedDates }) {
         setBlockedDates(newDates);
       } catch (e) {
         console.error(e);
-        alert('일정 변경에 실패했습니다. 권한을 확인해주세요.');
+        alert(e.message || '일정 변경에 실패했습니다. 다시 시도해 주세요.');
       }
     });
   };
