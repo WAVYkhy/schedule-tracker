@@ -20,7 +20,8 @@ export default async function PublicPage() {
       if (!blockedDates.includes(dateStr)) {
         return {
           month: m + 1,
-          date: d
+          date: d,
+          dateStr: dateStr
         };
       }
       current.setDate(current.getDate() + 1);
@@ -40,7 +41,7 @@ export default async function PublicPage() {
           <span className="highlight-date">{earliestDate.month}월 {earliestDate.date}일</span>부터 작업 가능합니다.
         </h1>
         
-        <CalendarClient initialBlockedDates={blockedDates} />
+        <CalendarClient initialBlockedDates={blockedDates} earliestStartStr={earliestDate.dateStr} />
       </div>
     </div>
   );

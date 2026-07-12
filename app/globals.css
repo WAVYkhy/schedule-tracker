@@ -125,17 +125,10 @@ body {
 
 /* Orange Accent Badge (Ember Badge) */
 .highlight-date {
-  display: inline-block;
-  background: var(--ember);
-  color: #ffffff;
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 0.95em;
-  -webkit-text-fill-color: initial;
-  box-shadow: none;
-  margin: 0 4px;
-  vertical-align: middle;
+  color: var(--ember);
+  font-weight: 700;
+  border-bottom: 2px solid var(--ember);
+  padding-bottom: 2px;
 }
 
 /* Navigation bar */
@@ -639,3 +632,114 @@ input:checked + .slider:before {
     display: block;
   }
 }
+
+/* Client Desired Deadline Checker Styles */
+.day-cell.selected-deadline {
+  box-shadow: 0 0 0 1.5px var(--ember) inset !important;
+  background-color: rgba(255, 90, 0, 0.05);
+  font-weight: 700;
+}
+
+.deadline-info-container {
+  margin-top: 2rem;
+  border-top: 1px solid var(--border-color);
+  padding-top: 1.5rem;
+}
+
+.deadline-card {
+  background: var(--snow);
+  border: 1px solid var(--border-color);
+  border-radius: 24px;
+  padding: 1.5rem;
+  box-shadow: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  .deadline-card {
+    background: #18181b;
+  }
+}
+
+.deadline-card-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.highlight-deadline-text {
+  color: var(--ember);
+  font-weight: 700;
+}
+
+.deadline-status-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.deadline-status-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.02);
+}
+
+@media (prefers-color-scheme: dark) {
+  .deadline-status-item {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+  }
+}
+
+.status-label {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.status-badge {
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 10000px;
+  padding: 4px 12px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.status-badge.available {
+  background: rgba(255, 90, 0, 0.08);
+  color: var(--ember);
+  border: 1px solid rgba(255, 90, 0, 0.2);
+}
+
+.status-badge.unavailable {
+  background: var(--paper);
+  color: var(--ash);
+  border: 1px solid var(--border-color);
+}
+
+@media (prefers-color-scheme: dark) {
+  .status-badge.unavailable {
+    background: #27272a;
+  }
+}
+
+.deadline-caption {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 400;
+  margin-top: 0.75rem;
+}
+
+.deadline-placeholder {
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-muted);
+  padding: 1.5rem;
+  border: 1px dashed var(--border-color);
+  border-radius: 24px;
+  background: transparent;
+}
+

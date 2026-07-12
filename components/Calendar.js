@@ -9,7 +9,9 @@ export default function Calendar({
   onToggleDate,
   selectedDates = [],
   onSelectDate,
-  isMultiSelectMode = false
+  isMultiSelectMode = false,
+  selectedDeadline = null,
+  onSelectDeadline
 }) {
   const today = new Date();
   const [currentDate, setCurrentDate] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
@@ -37,6 +39,7 @@ export default function Calendar({
 
   const isBlocked = (dateStr) => blockedDates.includes(dateStr);
   const isSelected = (dateStr) => selectedDates.includes(dateStr);
+  const isSelectedDeadline = (dateStr) => selectedDeadline === dateStr;
 
   const nextMonthDate = new Date(year, month + 1, 1);
 
@@ -57,6 +60,7 @@ export default function Calendar({
       const dateStr = formatDateString(y, m, d);
       const blocked = isBlocked(dateStr);
       const selected = isSelected(dateStr);
+      const selectedDeadlineClass = isSelectedDeadline(dateStr) ? 'selected-deadline' : '';
       const cellDate = new Date(y, m, d);
       const isPast = cellDate < todayMidnight;
 
@@ -64,12 +68,12 @@ export default function Calendar({
       const blockedClass = blocked ? 'blocked' : '';
       const selectedClass = selected ? 'selected' : '';
       const pastClass = isPast ? 'past' : '';
-      const interactiveClass = (isAdmin && !isPast) ? 'interactive' : '';
+      const interactiveClass = !isPast ? 'interactive' : '';
 
       days.push(
         <div
           key={d}
-          className={`day-cell ${todayClass} ${blockedClass} ${selectedClass} ${pastClass} ${interactiveClass}`.trim()}
+          className={`day-cell ${todayClass} ${blockedClass} ${selectedClass} ${selectedDeadlineClass} ${pastClass} ${interactiveClass}`.trim()}
           onClick={() => {
             if (isPast) return;
             if (isAdmin) {
@@ -77,6 +81,10 @@ export default function Calendar({
                 onSelectDate(dateStr);
               } else if (onToggleDate) {
                 onToggleDate(dateStr);
+              }
+            } else {
+              if (onSelectDeadline) {
+                onSelectDeadline(dateStr);
               }
             }
           }}
