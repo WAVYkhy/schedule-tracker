@@ -16,13 +16,26 @@ export default function CalendarClient({ initialBlockedDates, earliestStartStr }
   if (selectedDeadline && earliestStartStr) {
     const start = new Date(earliestStartStr);
     const deadline = new Date(selectedDeadline);
-    const timeDiff = deadline.getTime() - start.getTime();
-    const diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+    
+    let availableWorkingDays = 0;
+    let current = new Date(start);
+    
+    while (current <= deadline) {
+      const y = current.getFullYear();
+      const m = current.getMonth();
+      const d = current.getDate();
+      const dateStr = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      
+      if (!initialBlockedDates.includes(dateStr)) {
+        availableWorkingDays++;
+      }
+      current.setDate(current.getDate() + 1);
+    }
 
-    // Basic Omakase: 14 days
-    basicStatus = diffDays >= 14;
-    // Live2D + Omakase: 21 days
-    live2DStatus = diffDays >= 21;
+    // Basic Omakase: 14 working days
+    basicStatus = availableWorkingDays >= 14;
+    // Live2D + Omakase: 21 working days
+    live2DStatus = availableWorkingDays >= 21;
   }
 
   const formatKoreanDate = (dateStr) => {

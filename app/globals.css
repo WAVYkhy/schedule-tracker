@@ -309,6 +309,12 @@ body {
   background: rgba(255, 90, 0, 0.05);
 }
 
+.day-cell.blocked:not(.interactive) {
+  opacity: 0.45;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
 /* Past date state (Disabled copy) */
 .day-cell.past {
   opacity: 0.3;

@@ -68,7 +68,7 @@ export default function Calendar({
       const blockedClass = blocked ? 'blocked' : '';
       const selectedClass = selected ? 'selected' : '';
       const pastClass = isPast ? 'past' : '';
-      const interactiveClass = !isPast ? 'interactive' : '';
+      const interactiveClass = (isAdmin ? !isPast : (!isPast && !blocked)) ? 'interactive' : '';
 
       days.push(
         <div
@@ -83,7 +83,7 @@ export default function Calendar({
                 onToggleDate(dateStr);
               }
             } else {
-              if (onSelectDeadline) {
+              if (!blocked && onSelectDeadline) {
                 onSelectDeadline(dateStr);
               }
             }
