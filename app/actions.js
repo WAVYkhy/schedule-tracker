@@ -33,24 +33,46 @@ export async function getBlockedDates() {
   const { data, error } = await supabase.from('blocked_dates').select('date');
   if (error) {
     console.error('Error fetching blocked dates:', error);
-    return [];
+    throw new Error(`DB 조회 실패: ${error.message}`);
   }
   return data.map(d => d.date);
 }
 
 export async function toggleBlockedDate(dateStr) {
   const isAuth = await checkAuth();
-  if (!isAuth) throw new Error('Unauthorized');
+  if (!isAuth) throw new Error('인증되지 않은 사용자입니다.');
   
-  if (!supabase) throw new Error('Supabase not configured');
+  if (!supabase) throw new Error('Supabase 설정이 되지 않았습니다.');
 
-  const { data } = await supabase.from('blocked_dates').select('date').eq('date', dateStr).single();
+  // Check if date exists
+  const { data, error: selectError } = await supabase
+    .from('blocked_dates')
+    .select('date')
+    .eq('date', dateStr);
   
-  if (data) {
-    await supabase.from('blocked_dates').delete().eq('date', dateStr);
+  if (selectError) {
+    throw new Error(`DB 조회 오류: ${selectError.message}`);
+  }
+
+  const exists = data && data.length > 0;
+  
+  if (exists) {
+    const { error: deleteError } = await supabase
+      .from('blocked_dates')
+      .delete()
+      .eq('date', dateStr);
+    if (deleteError) {
+      throw new Error(`마감 해제 실패: ${deleteError.message}`);
+    }
   } else {
-    await supabase.from('blocked_dates').insert([{ date: dateStr }]);
+    const { error: insertError } = await supabase
+      .from('blocked_dates')
+      .insert([{ date: dateStr }]);
+    if (insertError) {
+      throw new Error(`마감 등록 실패: ${insertError.message}`);
+    }
   }
   
   return await getBlockedDates();
 }
+
