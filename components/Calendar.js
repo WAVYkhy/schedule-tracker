@@ -3,7 +3,14 @@
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-export default function Calendar({ blockedDates = [], isAdmin = false, onToggleDate }) {
+export default function Calendar({ 
+  blockedDates = [], 
+  isAdmin = false, 
+  onToggleDate,
+  selectedDates = [],
+  onSelectDate,
+  isMultiSelectMode = false
+}) {
   const today = new Date();
   const [currentDate, setCurrentDate] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
 
@@ -32,6 +39,7 @@ export default function Calendar({ blockedDates = [], isAdmin = false, onToggleD
   };
 
   const isBlocked = (dateStr) => blockedDates.includes(dateStr);
+  const isSelected = (dateStr) => selectedDates.includes(dateStr);
 
   const days = [];
   for (let i = 0; i < firstDay; i++) {
@@ -41,17 +49,23 @@ export default function Calendar({ blockedDates = [], isAdmin = false, onToggleD
   for (let d = 1; d <= daysInMonth; d++) {
     const dateStr = formatDateString(year, month, d);
     const blocked = isBlocked(dateStr);
+    const selected = isSelected(dateStr);
     const todayClass = isToday(d) ? 'today' : '';
     const interactiveClass = isAdmin ? 'interactive' : '';
     const blockedClass = blocked ? 'blocked' : '';
+    const selectedClass = selected ? 'selected' : '';
 
     days.push(
       <div
         key={d}
-        className={`day-cell ${todayClass} ${blockedClass} ${interactiveClass}`.trim()}
+        className={`day-cell ${todayClass} ${blockedClass} ${selectedClass} ${interactiveClass}`.trim()}
         onClick={() => {
-          if (isAdmin && onToggleDate) {
-            onToggleDate(dateStr);
+          if (isAdmin) {
+            if (isMultiSelectMode && onSelectDate) {
+              onSelectDate(dateStr);
+            } else if (onToggleDate) {
+              onToggleDate(dateStr);
+            }
           }
         }}
       >

@@ -84,4 +84,79 @@ export async function toggleBlockedDate(dateStr) {
   }
 }
 
+export async function addBlockedDates(dateStrings) {
+  try {
+    const isAuth = await checkAuth();
+    if (!isAuth) return { success: false, error: '인증되지 않은 사용자입니다.' };
+    
+    if (!supabase) return { success: false, error: 'Supabase 설정이 되지 않았습니다.' };
+
+    if (!Array.isArray(dateStrings) || dateStrings.length === 0) {
+      return { success: false, error: '등록할 날짜가 선택되지 않았습니다.' };
+    }
+
+    // 1. 중복 삽입 방지를 위해 기존 마감된 날짜 조회
+    const { data: existing, error: selectError } = await supabase
+      .from('blocked_dates')
+      .select('date')
+      .in('date', dateStrings);
+    
+    if (selectError) {
+      return { success: false, error: `DB 조회 오류: ${selectError.message}` };
+    }
+
+    const existingDates = (existing || []).map(d => d.date);
+    const newDates = dateStrings.filter(d => !existingDates.includes(d));
+
+    if (newDates.length > 0) {
+      const inserts = newDates.map(d => ({ date: d }));
+      const { error: insertError } = await supabase
+        .from('blocked_dates')
+        .insert(inserts);
+
+      if (insertError) {
+        return { success: false, error: `마감 등록 실패: ${insertError.message}` };
+      }
+    }
+    
+    const { data: updatedData, error: fetchError } = await supabase.from('blocked_dates').select('date');
+    if (fetchError) {
+      return { success: false, error: `업데이트된 일정 조회 실패: ${fetchError.message}` };
+    }
+    return { success: true, data: updatedData.map(d => d.date) };
+  } catch (err) {
+    return { success: false, error: `서버 오류가 발생했습니다: ${err.message}` };
+  }
+}
+
+export async function removeBlockedDates(dateStrings) {
+  try {
+    const isAuth = await checkAuth();
+    if (!isAuth) return { success: false, error: '인증되지 않은 사용자입니다.' };
+    
+    if (!supabase) return { success: false, error: 'Supabase 설정이 되지 않았습니다.' };
+
+    if (!Array.isArray(dateStrings) || dateStrings.length === 0) {
+      return { success: false, error: '해제할 날짜가 선택되지 않았습니다.' };
+    }
+
+    const { error: deleteError } = await supabase
+      .from('blocked_dates')
+      .delete()
+      .in('date', dateStrings);
+
+    if (deleteError) {
+      return { success: false, error: `마감 해제 실패: ${deleteError.message}` };
+    }
+    
+    const { data: updatedData, error: fetchError } = await supabase.from('blocked_dates').select('date');
+    if (fetchError) {
+      return { success: false, error: `업데이트된 일정 조회 실패: ${fetchError.message}` };
+    }
+    return { success: true, data: updatedData.map(d => d.date) };
+  } catch (err) {
+    return { success: false, error: `서버 오류가 발생했습니다: ${err.message}` };
+  }
+}
+
 
