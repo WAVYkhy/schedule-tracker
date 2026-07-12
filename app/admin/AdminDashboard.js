@@ -12,12 +12,11 @@ export default function AdminDashboard({ initialBlockedDates }) {
 
   const handleToggleDate = (dateStr) => {
     startTransition(async () => {
-      try {
-        const newDates = await toggleBlockedDate(dateStr);
-        setBlockedDates(newDates);
-      } catch (e) {
-        console.error(e);
-        alert(e.message || '일정 변경에 실패했습니다. 다시 시도해 주세요.');
+      const res = await toggleBlockedDate(dateStr);
+      if (res.success) {
+        setBlockedDates(res.data);
+      } else {
+        alert(res.error || '일정 변경에 실패했습니다. 다시 시도해 주세요.');
       }
     });
   };
