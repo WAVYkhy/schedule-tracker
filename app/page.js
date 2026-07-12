@@ -32,11 +32,13 @@ export default async function PublicPage() {
   return (
     <div className="app-container">
       <div className="glass-card">
-        <h1 className="title">
-          가장 빠른 작업 시작 가능일은 <br/>
-          <span className="highlight-date">{earliestDate.month}월 {earliestDate.date}일</span> 입니다.
+        <div className="brand-header">
+          <span className="brand-logo">WAVIT_studio</span>
+        </div>
+        <h1 className="title" style={{ marginBottom: '2rem' }}>
+          지금 예약하실 경우 <br className="mobile-br"/>
+          <span className="highlight-date">{earliestDate.month}월 {earliestDate.date}일</span>부터 작업 가능합니다.
         </h1>
-        <p className="subtitle">일정을 확인하시고 문의해 주세요.</p>
         
         <CalendarClient initialBlockedDates={blockedDates} />
       </div>
