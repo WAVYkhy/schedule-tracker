@@ -726,9 +726,79 @@ input:checked + .slider:before {
   border: 1px solid var(--border-color);
 }
 
+.status-badge.negotiate {
+  background: var(--paper);
+  color: var(--fog);
+  border: 1px solid var(--border-color);
+  cursor: default;
+  position: relative;
+}
+
+/* Tooltip container */
+.status-badge.negotiate::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 135%;
+  right: 0;
+  background: var(--graphite);
+  color: var(--snow);
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.4;
+  width: 260px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  transform: translateY(4px);
+  pointer-events: none;
+  text-align: left;
+  white-space: normal;
+}
+
+/* Small triangle/arrow for the tooltip */
+.status-badge.negotiate::before {
+  content: '';
+  position: absolute;
+  bottom: 115%;
+  right: 15px;
+  border-width: 6px;
+  border-style: solid;
+  border-color: var(--graphite) transparent transparent transparent;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  transform: translateY(4px);
+  pointer-events: none;
+}
+
+.status-badge.negotiate:hover::after,
+.status-badge.negotiate:hover::before {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
 @media (prefers-color-scheme: dark) {
   .status-badge.unavailable {
     background: #27272a;
+  }
+  .status-badge.negotiate {
+    background: #1e1e21;
+    color: var(--text-muted);
+    border: 1px solid var(--border-color);
+  }
+  .status-badge.negotiate::after {
+    background: #27272a;
+    color: var(--snow);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  }
+  .status-badge.negotiate::before {
+    border-color: #27272a transparent transparent transparent;
   }
 }
 

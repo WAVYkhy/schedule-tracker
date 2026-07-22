@@ -32,10 +32,23 @@ export default function CalendarClient({ initialBlockedDates, earliestStartStr }
       current.setDate(current.getDate() + 1);
     }
 
-    // Basic Omakase: 14 working days
-    basicStatus = availableWorkingDays >= 14;
-    // Live2D + Omakase: 21 working days
-    live2DStatus = availableWorkingDays >= 21;
+    // Basic Omakase: 14+ days -> available, 7-13 days -> negotiate, <7 days -> unavailable
+    if (availableWorkingDays >= 14) {
+      basicStatus = 'available';
+    } else if (availableWorkingDays >= 7) {
+      basicStatus = 'negotiate';
+    } else {
+      basicStatus = 'unavailable';
+    }
+
+    // Live2D + Omakase: 21+ days -> available, 7-20 days -> negotiate, <7 days -> unavailable
+    if (availableWorkingDays >= 21) {
+      live2DStatus = 'available';
+    } else if (availableWorkingDays >= 7) {
+      live2DStatus = 'negotiate';
+    } else {
+      live2DStatus = 'unavailable';
+    }
   }
 
   const formatKoreanDate = (dateStr) => {
@@ -43,6 +56,8 @@ export default function CalendarClient({ initialBlockedDates, earliestStartStr }
     const [y, m, d] = dateStr.split('-');
     return `${parseInt(m)}월 ${parseInt(d)}일`;
   };
+
+  const tooltipText = "곡, 일러스트, 요청사항 등의 검토가 필요합니다. 기간 부족에 따른 추가금이 요청될 수 있다는 점 양해 부탁드립니다.";
 
   return (
     <div className="client-calendar-wrapper">
@@ -63,14 +78,20 @@ export default function CalendarClient({ initialBlockedDates, earliestStartStr }
             <div className="deadline-status-list">
               <div className="deadline-status-item">
                 <span className="status-label">기본 오마카세 (14일 소요)</span>
-                <span className={`status-badge ${basicStatus ? 'available' : 'unavailable'}`}>
-                  {basicStatus ? '작업 가능' : '기간 부족'}
+                <span 
+                  className={`status-badge ${basicStatus}`}
+                  data-tooltip={basicStatus === 'negotiate' ? tooltipText : undefined}
+                >
+                  {basicStatus === 'available' ? '작업 가능' : basicStatus === 'negotiate' ? '협의 필요' : '기간 부족'}
                 </span>
               </div>
               <div className="deadline-status-item">
                 <span className="status-label">오마카세 + Live2D (21일 소요)</span>
-                <span className={`status-badge ${live2DStatus ? 'available' : 'unavailable'}`}>
-                  {live2DStatus ? '작업 가능' : '기간 부족'}
+                <span 
+                  className={`status-badge ${live2DStatus}`}
+                  data-tooltip={live2DStatus === 'negotiate' ? tooltipText : undefined}
+                >
+                  {live2DStatus === 'available' ? '작업 가능' : live2DStatus === 'negotiate' ? '협의 필요' : '기간 부족'}
                 </span>
               </div>
             </div>
