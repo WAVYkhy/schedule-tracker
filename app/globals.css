@@ -1,37 +1,44 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
 
 /* ==========================================================================
-   NORDIC GLASS-CUT SHARP EDGE DESIGN SYSTEM
+   NORDIC GLASS-CUT SHARP EDGE DESIGN SYSTEM SPEC 01
    ========================================================================== */
 :root {
+  /* Surface & Background */
   --nordic-bg: #FAFAFA;
   --nordic-surface: #FFFFFF;
   --nordic-surface-subtle: #F4F4F5;
   --nordic-border: #D4D4D8;
   --nordic-border-strong: #000000;
 
+  /* Typography */
   --text-primary: #000000;
   --text-secondary: #3F3F46;
   --text-muted: #71717A;
 
+  /* Accent & Active Inversion */
   --accent-color: #000000;
   --accent-surface: #000000;
   --accent-text: #FFFFFF;
 
+  /* Sharp Edge Radii (Strict 2px Rules) */
   --card-radius: 2px;
   --cell-radius: 2px;
   --pill-radius: 2px;
 
-  --status-available: #10b981;
-  --status-negotiate: #f59e0b;
-  --status-unavailable: #ef4444;
+  /* Status Dots */
+  --status-available: #10B981;
+  --status-negotiate: #F59E0B;
+  --status-unavailable: #EF4444;
 
-  --danger-color: #ef4444;
+  --danger-color: #EF4444;
   --border-color: var(--nordic-border);
   --bg-color: var(--nordic-bg);
+
+  --font-sans: 'Inter', 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-/* Dark mode fallback */
+/* Dark Mode Overrides */
 @media (prefers-color-scheme: dark) {
   :root {
     --nordic-bg: #09090B;
@@ -60,7 +67,7 @@
 }
 
 body {
-  font-family: 'Inter', 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: var(--font-sans);
   background-color: var(--bg-color);
   color: var(--text-secondary);
   -webkit-font-smoothing: antialiased;
@@ -76,7 +83,12 @@ body {
   width: 100%;
 }
 
-/* Sharp Edge Geometric Card: 2px sharp corners, crisp hairline border */
+/* --------------------------------------------------------------------------
+   CORE SPEC COMPONENTS & UTILITIES
+   -------------------------------------------------------------------------- */
+
+/* A. Cards & Containers */
+.sharp-card,
 .glass-card {
   background: var(--nordic-surface);
   border: 1px solid var(--nordic-border);
@@ -87,10 +99,154 @@ body {
 }
 
 @media (max-width: 480px) {
+  .sharp-card,
   .glass-card {
     padding: 24px 16px;
   }
 }
+
+/* B. Micro Tags & Labels */
+.sharp-tag,
+.brand-logo {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--text-primary);
+  background: var(--nordic-surface-subtle);
+  padding: 5px 12px;
+  border-radius: var(--pill-radius);
+  border: 1px solid var(--nordic-border);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.sharp-tag::before,
+.brand-logo::before {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  background-color: var(--accent-surface);
+}
+
+/* C. Buttons & Controls */
+.btn-sharp-primary,
+.btn-primary {
+  background: var(--accent-surface);
+  color: var(--accent-text);
+  border: 1px solid var(--accent-surface);
+  border-radius: var(--pill-radius);
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-sharp-primary:hover,
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+.btn-sharp-outline,
+.btn-outline {
+  background: var(--nordic-surface);
+  color: var(--text-primary);
+  border: 1px solid var(--nordic-border);
+  border-radius: var(--pill-radius);
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-sharp-outline:hover,
+.btn-outline:hover {
+  background: var(--nordic-surface-subtle);
+  border-color: var(--nordic-border-strong);
+}
+
+/* D. Inputs & Form Elements */
+.input-sharp,
+.input-field {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--nordic-border);
+  border-radius: var(--cell-radius);
+  background: var(--nordic-surface);
+  color: var(--text-primary);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.12s ease;
+}
+
+.input-sharp:focus,
+.input-field:focus {
+  border-color: var(--nordic-border-strong);
+  box-shadow: 0 0 0 1px var(--nordic-border-strong);
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.input-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+/* E. Grid Items & Active States */
+.grid-item-sharp,
+.day-cell {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13.5px;
+  font-weight: 500;
+  border-radius: var(--cell-radius);
+  cursor: default;
+  transition: all 0.12s ease;
+  position: relative;
+  user-select: none;
+  border: 1px solid transparent;
+  outline: none;
+  color: var(--text-primary);
+}
+
+.grid-item-sharp:hover,
+.day-cell.interactive:hover {
+  background: var(--nordic-surface-subtle);
+  border-color: var(--nordic-border-strong);
+}
+
+.grid-item-sharp.selected,
+.day-cell.selected,
+.day-cell.selected-deadline {
+  background-color: var(--accent-surface) !important;
+  color: var(--accent-text) !important;
+  font-weight: 600;
+  border-color: var(--accent-surface) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* --------------------------------------------------------------------------
+   APPLICATION STRUCTURE & COMPONENTS
+   -------------------------------------------------------------------------- */
 
 /* Brand Header */
 .brand-header {
@@ -108,30 +264,6 @@ body {
     justify-content: center;
     gap: 0.75rem;
   }
-}
-
-/* Sharp Edge Brand Logo Tag */
-.brand-logo {
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  color: var(--text-primary);
-  background: var(--nordic-surface-subtle);
-  padding: 5px 12px;
-  border-radius: var(--pill-radius);
-  border: 1px solid var(--nordic-border);
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-}
-
-.brand-logo::before {
-  content: '';
-  display: inline-block;
-  width: 4px;
-  height: 4px;
-  background-color: var(--accent-surface);
 }
 
 /* Language Switcher Segmented Control */
@@ -188,7 +320,7 @@ body {
   border: 1px solid var(--nordic-border-strong);
 }
 
-/* Display Title */
+/* Typography & Titles */
 .title {
   font-size: 28px;
   font-weight: 600;
@@ -199,13 +331,20 @@ body {
   letter-spacing: -0.03em;
 }
 
+.subtitle {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  letter-spacing: -0.015em;
+}
+
 @media (max-width: 480px) {
   .title {
     font-size: 21px;
   }
 }
 
-/* Sharp Highlight Date Badge */
+/* Highlight Date Badge */
 .highlight-date {
   color: var(--accent-text);
   background: var(--accent-surface);
@@ -218,7 +357,7 @@ body {
   margin: 0 4px;
 }
 
-/* Navigation bar */
+/* Navigation & Admin Actions */
 .admin-header-actions {
   display: flex;
   justify-content: space-between;
@@ -245,7 +384,7 @@ body {
   border-color: var(--nordic-border-strong);
 }
 
-/* Double Calendar Container */
+/* Double Calendar Layout */
 .calendar {
   width: 100%;
 }
@@ -302,7 +441,7 @@ body {
   text-align: center;
   margin-bottom: 1.25rem;
   color: var(--text-primary);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
 }
 
 .calendar-grid {
@@ -321,31 +460,9 @@ body {
   padding-bottom: 0.5rem;
 }
 
-/* Day cell styles (Razor 2px Sharp Geometric Cells) */
-.day-cell {
-  aspect-ratio: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13.5px;
-  font-weight: 500;
-  border-radius: var(--cell-radius);
-  cursor: default;
-  transition: all 0.12s ease;
-  position: relative;
-  user-select: none;
-  border: 1px solid transparent;
-  outline: none;
-  color: var(--text-primary);
-}
-
+/* Day cell states */
 .day-cell.interactive {
   cursor: pointer;
-}
-
-.day-cell.interactive:hover {
-  background: var(--nordic-surface-subtle);
-  border-color: var(--nordic-border-strong);
 }
 
 .day-cell.interactive:active {
@@ -396,16 +513,6 @@ body {
   pointer-events: none;
 }
 
-/* Selected state (Razor Inverted Monochrome Block) */
-.day-cell.selected,
-.day-cell.selected-deadline {
-  background-color: var(--accent-surface) !important;
-  color: var(--accent-text) !important;
-  font-weight: 600;
-  border-color: var(--accent-surface) !important;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
-}
-
 .day-cell.selected.today::after,
 .day-cell.selected-deadline.today::after {
   background-color: var(--accent-text);
@@ -431,6 +538,7 @@ body {
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 1.25rem;
+  letter-spacing: -0.015em;
 }
 
 .highlight-deadline-text {
@@ -559,6 +667,175 @@ body {
   color: var(--text-primary);
 }
 
+.error-message {
+  color: var(--danger-color);
+  font-size: 13px;
+  margin-top: 0.75rem;
+  text-align: center;
+}
+
+/* Admin Multi-Select Controls & Panels */
+.multi-select-toggle-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--nordic-surface-subtle);
+  padding: 10px 14px;
+  border-radius: var(--cell-radius);
+  border: 1px solid var(--nordic-border);
+  margin-bottom: 1.25rem;
+}
+
+.multi-select-label-wrapper {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-primary);
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: var(--nordic-border);
+  transition: 0.15s ease;
+  border-radius: var(--pill-radius);
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  left: 3px;
+  bottom: 3px;
+  background-color: var(--nordic-surface);
+  transition: 0.15s ease;
+  border-radius: var(--pill-radius);
+}
+
+input:checked + .slider {
+  background-color: var(--accent-surface);
+}
+
+input:checked + .slider:before {
+  transform: translateX(16px);
+  background-color: var(--accent-text);
+}
+
+.batch-actions-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding: 14px 18px;
+  background: var(--nordic-surface-subtle);
+  border: 1px solid var(--nordic-border);
+  border-radius: var(--card-radius);
+  flex-wrap: wrap;
+}
+
+.batch-actions-info {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.batch-actions-info .badge {
+  background: var(--accent-surface);
+  color: var(--accent-text);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--pill-radius);
+}
+
+.batch-actions-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.batch-btn-block {
+  background: var(--accent-surface);
+  color: var(--accent-text);
+  border: 1px solid var(--accent-surface);
+  border-radius: var(--pill-radius);
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.batch-btn-block:hover {
+  opacity: 0.9;
+}
+
+.batch-btn-unblock {
+  background: var(--nordic-surface);
+  color: var(--text-primary);
+  border: 1px solid var(--nordic-border);
+  border-radius: var(--pill-radius);
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.batch-btn-unblock:hover {
+  background: var(--nordic-surface-subtle);
+  border-color: var(--nordic-border-strong);
+}
+
+.batch-btn-clear {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid transparent;
+  border-radius: var(--pill-radius);
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.batch-btn-clear:hover {
+  color: var(--text-primary);
+}
+
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--nordic-border);
+  border-top-color: var(--accent-surface);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Footer */
 .app-footer {
   text-align: center;
   margin-top: 2rem;

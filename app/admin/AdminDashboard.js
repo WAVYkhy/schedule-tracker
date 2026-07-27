@@ -75,7 +75,7 @@ export default function AdminDashboard({ initialBlockedDates }) {
 
   return (
     <div className="app-container">
-      <div className="glass-card">
+      <div className="sharp-card">
         <div className="admin-header-actions">
           <h1 className="title" style={{ marginBottom: 0, textAlign: 'left' }}>일정 관리</h1>
           <button onClick={handleLogout} className="btn-icon" aria-label="로그아웃" title="로그아웃">
@@ -103,7 +103,7 @@ export default function AdminDashboard({ initialBlockedDates }) {
 
         <div style={{ position: 'relative' }}>
           {isPending && (
-            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(255,255,255,0.5)', zIndex: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '1rem' }}>
+            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(255,255,255,0.5)', zIndex: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 'var(--card-radius)' }}>
               <div className="spinner"></div>
             </div>
           )}

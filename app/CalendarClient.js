@@ -66,7 +66,7 @@ export default function CalendarClient({ initialBlockedDates, earliestStartStr, 
 
   return (
     <div className="client-public-container">
-      <div className="glass-card">
+      <div className="sharp-card">
         <div className="brand-header">
           <span className="brand-logo">{t('brand_logo')}</span>
           <LanguageSwitcher />
