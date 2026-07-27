@@ -142,7 +142,7 @@ export default function Calendar({
             <div 
               key={day} 
               className="weekday" 
-              style={{ color: idx === 0 ? 'var(--danger-color)' : idx === 6 ? 'var(--accent-color)' : 'var(--text-muted)'}}
+              style={{ color: idx === 0 ? 'var(--danger-color)' : 'var(--text-muted)' }}
             >
               {day}
             </div>
