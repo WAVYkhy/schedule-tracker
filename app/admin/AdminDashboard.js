@@ -152,6 +152,9 @@ export default function AdminDashboard({ initialBlockedDates }) {
           </div>
         )}
       </div>
+      <footer className="app-footer">
+        designed by WAVIT
+      </footer>
     </div>
   );
 }
