@@ -35,7 +35,7 @@ export async function getBlockedDates() {
     console.error('Error fetching blocked dates:', error);
     throw new Error(`DB 조회 실패: ${error.message}`);
   }
-  return data.map(d => d.date);
+  return (data || []).map(d => d.date);
 }
 
 export async function toggleBlockedDate(dateStr) {
@@ -78,7 +78,7 @@ export async function toggleBlockedDate(dateStr) {
     if (fetchError) {
       return { success: false, error: `업데이트된 일정 조회 실패: ${fetchError.message}` };
     }
-    return { success: true, data: updatedData.map(d => d.date) };
+    return { success: true, data: (updatedData || []).map(d => d.date) };
   } catch (err) {
     return { success: false, error: `서버 오류가 발생했습니다: ${err.message}` };
   }
@@ -123,7 +123,7 @@ export async function addBlockedDates(dateStrings) {
     if (fetchError) {
       return { success: false, error: `업데이트된 일정 조회 실패: ${fetchError.message}` };
     }
-    return { success: true, data: updatedData.map(d => d.date) };
+    return { success: true, data: (updatedData || []).map(d => d.date) };
   } catch (err) {
     return { success: false, error: `서버 오류가 발생했습니다: ${err.message}` };
   }
@@ -153,7 +153,7 @@ export async function removeBlockedDates(dateStrings) {
     if (fetchError) {
       return { success: false, error: `업데이트된 일정 조회 실패: ${fetchError.message}` };
     }
-    return { success: true, data: updatedData.map(d => d.date) };
+    return { success: true, data: (updatedData || []).map(d => d.date) };
   } catch (err) {
     return { success: false, error: `서버 오류가 발생했습니다: ${err.message}` };
   }
