@@ -266,6 +266,39 @@ body {
   }
 }
 
+/* Language Transition Animation: 2-Phase Cross-Fade & Shift (Total ~0.4s, 12px shift) */
+@keyframes sharpFadeOut {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+}
+
+@keyframes sharpFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.lang-fading-out {
+  animation: sharpFadeOut 0.18s cubic-bezier(0.4, 0, 1, 1) forwards;
+  will-change: opacity, transform;
+}
+
+.lang-fading-in {
+  animation: sharpFadeIn 0.22s cubic-bezier(0, 0, 0.2, 1) forwards;
+  will-change: opacity, transform;
+}
+
 /* Language Switcher Segmented Control */
 .lang-switcher-container {
   display: flex;

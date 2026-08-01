@@ -14,7 +14,8 @@ export default function Calendar({
   selectedDeadline = null,
   onSelectDeadline
 }) {
-  const { t, formatHeaderRange, formatMonthTitle, formatDayAriaLabel } = useLanguage();
+  const { lang, isTransitioning, t, formatHeaderRange, formatMonthTitle, formatDayAriaLabel } = useLanguage();
+  const langAnimClass = isTransitioning ? 'lang-fading-out' : 'lang-fading-in';
   const today = new Date();
 
   const getInitialDate = () => {
@@ -136,12 +137,12 @@ export default function Calendar({
 
     return (
       <div className="calendar-month">
-        <h3 className="calendar-month-title">{formatMonthTitle(monthDate)}</h3>
+        <h3 key={`month-title-${isTransitioning ? 'out' : lang}-${y}-${m}`} className={`calendar-month-title ${langAnimClass}`}>{formatMonthTitle(monthDate)}</h3>
         <div className="calendar-grid">
           {weekdaysList.map((day, idx) => (
             <div 
-              key={day} 
-              className="weekday" 
+              key={`weekday-${isTransitioning ? 'out' : lang}-${day}`} 
+              className={`weekday ${langAnimClass}`} 
               style={{ color: idx === 0 ? 'var(--danger-color)' : 'var(--text-muted)' }}
             >
               {day}
@@ -159,7 +160,7 @@ export default function Calendar({
         <button onClick={prevMonth} aria-label={t('nav_prev_month')}>
           <ChevronLeft size={20} />
         </button>
-        <span className="calendar-nav-title">{formatHeaderRange(currentDate, nextMonthDate)}</span>
+        <span key={`nav-title-${isTransitioning ? 'out' : lang}`} className={`calendar-nav-title ${langAnimClass}`}>{formatHeaderRange(currentDate, nextMonthDate)}</span>
         <button onClick={nextMonth} aria-label={t('nav_next_month')}>
           <ChevronRight size={20} />
         </button>

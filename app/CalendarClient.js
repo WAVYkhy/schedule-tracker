@@ -9,7 +9,8 @@ import { Calendar as CalendarIcon } from 'lucide-react';
 export default function CalendarClient({ initialBlockedDates, earliestStartStr, earliestDateObj }) {
   const [selectedDeadline, setSelectedDeadline] = useState(null);
   const [activeTooltip, setActiveTooltip] = useState(null);
-  const { t, formatDate } = useLanguage();
+  const { lang, isTransitioning, t, formatDate } = useLanguage();
+  const langAnimClass = isTransitioning ? 'lang-fading-out' : 'lang-fading-in';
 
   const handleSelectDeadline = (dateStr) => {
     setSelectedDeadline(dateStr);
@@ -68,11 +69,11 @@ export default function CalendarClient({ initialBlockedDates, earliestStartStr, 
     <div className="client-public-container">
       <div className="sharp-card">
         <div className="brand-header">
-          <span className="brand-logo">{t('brand_logo')}</span>
+          <span key={`logo-${isTransitioning ? 'out' : lang}`} className={`brand-logo ${langAnimClass}`}>{t('brand_logo')}</span>
           <LanguageSwitcher />
         </div>
         
-        <h1 className="title" style={{ marginBottom: '2.25rem' }}>
+        <h1 key={`title-${isTransitioning ? 'out' : lang}`} className={`title ${langAnimClass}`} style={{ marginBottom: '2.25rem' }}>
           {t('header_title_prefix')}
           <br className="mobile-br"/>
           <span className="highlight-date">{formatDate(earliestDateObj)}</span>
@@ -88,7 +89,7 @@ export default function CalendarClient({ initialBlockedDates, earliestStartStr, 
           />
 
           {/* Deadline Info Panel */}
-          <div className="deadline-info-container">
+          <div key={`deadline-${isTransitioning ? 'out' : lang}`} className={`deadline-info-container ${langAnimClass}`}>
             {selectedDeadline ? (
               <div className="deadline-card">
                 <h3 className="deadline-card-title">
@@ -137,7 +138,7 @@ export default function CalendarClient({ initialBlockedDates, earliestStartStr, 
         </div>
       </div>
 
-      <footer className="app-footer">
+      <footer key={`footer-${isTransitioning ? 'out' : lang}`} className={`app-footer ${langAnimClass}`}>
         {t('footer_text')}
       </footer>
     </div>
