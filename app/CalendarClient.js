@@ -43,8 +43,8 @@ export default function CalendarClient({ initialBlockedDates, earliestStartStr, 
       current.setDate(current.getDate() + 1);
     }
 
-    // Basic Omakase: 14+ days -> available, 7-13 days -> negotiate, <7 days -> unavailable
-    if (availableWorkingDays >= 14) {
+    // Basic Omakase: 10+ days -> available, 7-9 days -> negotiate, <7 days -> unavailable
+    if (availableWorkingDays >= 10) {
       basicStatus = 'available';
     } else if (availableWorkingDays >= 7) {
       basicStatus = 'negotiate';
@@ -52,8 +52,8 @@ export default function CalendarClient({ initialBlockedDates, earliestStartStr, 
       basicStatus = 'unavailable';
     }
 
-    // Live2D + Omakase: 21+ days -> available, 7-20 days -> negotiate, <7 days -> unavailable
-    if (availableWorkingDays >= 21) {
+    // Live2D + Omakase: 15+ days -> available, 7-14 days -> negotiate, <7 days -> unavailable
+    if (availableWorkingDays >= 15) {
       live2DStatus = 'available';
     } else if (availableWorkingDays >= 7) {
       live2DStatus = 'negotiate';
