@@ -1,0 +1,38 @@
+name: Self-Hosted Auto Deploy
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'README.md'
+      - 'docs/**'
+      - '.gitignore'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, schedule-tracker]
+    steps:
+      - name: Deploy to Local Host
+        shell: powershell
+        run: |
+          Set-Location -Path "C:\apps\schedule"
+          $env:PATH = "$env:LOCALAPPDATA\Programs\NodeJS;$env:LOCALAPPDATA\Programs\Git\cmd;$env:PATH"
+          
+          Write-Host ">>> Pulling latest changes from origin/main..."
+          git pull origin main
+          
+          Write-Host ">>> Building application..."
+          npm run build
+          
+          Write-Host ">>> Restarting port 3000 service..."
+          wscript //nologo "C:\apps\schedule\scripts\start-server.vbs"
+          
+          Start-Sleep -Seconds 3
+          $status = (Invoke-WebRequest -Uri "http://localhost:3000" -UseBasicParsing -TimeoutSec 10).StatusCode
+          Write-Host ">>> Healthcheck HTTP status: $status"
+          
+          $global:LASTEXITCODE = 0
+          Write-Host ">>> Deployment completed successfully!"
+          exit 0
