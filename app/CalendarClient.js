@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Calendar from '@/components/Calendar';
-import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { useLanguage } from '@/lib/i18n';
 import { Calendar as CalendarIcon } from 'lucide-react';
 
@@ -70,7 +69,6 @@ export default function CalendarClient({ initialBlockedDates, earliestStartStr, 
       <div className="sharp-card">
         <div className="brand-header">
           <span key={`logo-${isTransitioning ? 'out' : lang}`} className={`brand-logo ${langAnimClass}`}>{t('brand_logo')}</span>
-          <LanguageSwitcher />
         </div>
         
         <h1 key={`title-${isTransitioning ? 'out' : lang}`} className={`title ${langAnimClass}`} style={{ marginBottom: '2.25rem' }}>
