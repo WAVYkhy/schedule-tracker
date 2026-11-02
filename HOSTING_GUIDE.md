@@ -1,184 +1,188 @@
-﻿# ?뙋 Wavit Studio ?몄뒪???명봽??諛??쒕쾭 ?댁쁺 紐낆꽭??
-??臾몄꽌??**Cloudflare Pages(?대씪?곕뱶 ?쒕쾭由ъ뒪)** 諛?Windows 11 ?섍꼍??**Cloudflare Tunnel + PM2(濡쒖뺄 ?몄뒪??**瑜??듯빐 ?곸떆 臾댁쨷???댁쁺 以묒씤 ???좏뵆由ъ??댁뀡 諛?諛깆뿏???쒕퉬?ㅼ쓽 ?꾩껜 援ъ꽦怨??댁쁺 媛?대뱶瑜?湲곕줉??怨듭떇 臾몄꽌?낅땲??
+# 🌐 Wavit Studio 호스팅 인프라 및 서버 운영 명세서
+
+이 문서는 **Cloudflare Pages(클라우드 서버리스)** 및 Windows 11 환경의 **Cloudflare Tunnel + PM2/작업 스케줄러(로컬 호스팅)**를 통해 상시 무중단 운영 중인 웹 애플리케이션 및 백엔드 서비스의 전체 구성과 운영 가이드를 기록한 공식 문서입니다.
 
 ---
 
-## 1. ?룛截??꾩껜 ?쒖뒪???꾪궎?띿쿂
+## 1. 🏗️ 전체 시스템 아키텍처
 
-- **諛⑸Ц??(?몃? ?명꽣???묒냽 寃쎈줈)**:
-  - `https://wavit-studio.com` (?먮뒗 `www`) ??**WAVIT Studio 硫붿씤 ?ы듃?대━??* (Cloudflare Pages 臾댁쨷???대씪?곕뱶 ?몄뒪??
-  - `https://schedule.wavit-studio.com` ??**Schedule Tracker** (濡쒖뺄 ?몄뒪??PC)
-  - `https://virtualindex.wavit-studio.com` ??**VirtualIndex** (濡쒖뺄 ?몄뒪??PC)
+- **방문자 (외부 인터넷 접속 경로)**:
+  - `https://wavit-studio.com` (또는 `www`) ➔ **WAVIT Studio 메인 포트폴리오** (Cloudflare Pages 무중단 클라우드 호스팅)
+  - `https://schedule.wavit-studio.com` ➔ **Schedule Tracker** (로컬 호스팅 PC)
+  - `https://virtualindex.wavit-studio.com` ➔ **VirtualIndex** (로컬 호스팅 PC)
 - **Cloudflare Edge**:
-  - DNS CNAME ?쇱슦?? SSL/TLS ?먮룞 ?뷀샇?? DDoS 諛⑹뼱 諛?湲濡쒕쾶 ?ｌ? 罹먯떛
-  - `_redirects` 洹쒖튃???듯빐 `/theme_sharp_desktop` ?묎렐 ??猷⑦듃(`/`)濡?301 ?곴뎄 ?대룞
-- **濡쒖뺄 ?몄뒪??PC (Windows 11)**:
-  - **?덈룄???쒕퉬??*: `Cloudflared` (?곕꼸 ?꾩썐諛붿슫???곌껐 ?좎?)
-  - **?덈룄???묒뾽 ?ㅼ?以꾨윭 (遺?????곸떆 臾댁쨷??援щ룞)**:
-    - `Schedule_Server` (Next.js 16.2.10, ?ы듃 3000, `C:\apps\schedule\scripts\start-server.vbs`)
-    - `VirtualIndex_Server` (Next.js 16.3.6, ?ы듃 3001, `C:\Users\wkjne\virtualindex\scripts\start-server.vbs`)
-    - `VirtualIndex_Collector` (?ㅼ떆媛?諛⑹넚 ?섏쭛湲? 5遺?二쇨린 媛??
-  - **PM2 ?꾨줈?몄뒪 留ㅻ땲? (蹂댁“/?섎룞 愿由?**:
-    - `schedule-web` (Next.js 16.2.10, ?ы듃 3000)
-    - `virtualindex-server` (Next.js 16.3.6, ?ы듃 3001)
-    - `virtualindex-collector` (?ㅼ떆媛?諛⑹넚 ?섏쭛湲?
-- **?몃? ?대씪?곕뱶**:
-  - Supabase PostgreSQL ?대씪?곕뱶 ?곗씠?곕쿋?댁뒪
-  - 移섏?吏?/ ?좏뒠釉?/ ?몄쐞移?/ ???꾪봽由ъ뭅) Open API
+  - DNS CNAME 라우팅, SSL/TLS 자동 암호화, DDoS 방어 및 글로벌 엣지 캐싱
+  - `_redirects` 규칙을 통해 `/theme_sharp_desktop` 접근 시 루트(`/`)로 301 영구 이동
+- **로컬 호스팅 PC (Windows 11)**:
+  - **윈도우 서비스**: `Cloudflared` (터널 아웃바운드 연결 유지)
+  - **윈도우 작업 스케줄러 (부팅 시 상시 무중단 구동)**:
+    - `Schedule_Server` (Next.js 16.2.10, 포트 3000, `C:\apps\schedule\scripts\start-server.vbs`)
+    - `Schedule_Runner` (GitHub Actions Self-hosted Runner, `C:\apps\schedule\scripts\start-runner.vbs`)
+    - `VirtualIndex_Server` (Next.js 16.3.6, 포트 3001, `C:\Users\wkjne\virtualindex\scripts\start-server.vbs`)
+    - `VirtualIndex_Collector` (실시간 방송 수집기, 5분 주기 가동)
+  - **PM2 프로세스 매니저 (보조/수동 관리)**:
+    - `schedule-web` (Next.js 16.2.10, 포트 3000)
+    - `virtualindex-server` (Next.js 16.3.6, 포트 3001)
+    - `virtualindex-collector` (실시간 방송 수집기)
+- **외부 클라우드**:
+  - Supabase PostgreSQL 클라우드 데이터베이스
+  - 치지직 / 유튜브 / 트위치 / SOOP(구 아프리카) Open API
 
 ---
 
-## 2. ?뱥 ?쒖꽦 ?몄뒪???쒕퉬???곸꽭 紐⑸줉
+## 2. 📑 활성 호스팅 서비스 상세 목록
 
-| ??ぉ | 硫붿씤: WAVIT Studio | ?쒕퉬??1: Schedule Tracker | ?쒕퉬??2: VirtualIndex | ?쒕퉬??3: Live Collector |
+| 항목 | 메인: WAVIT Studio | 서비스 1: Schedule Tracker | 서비스 2: VirtualIndex | 서비스 3: Live Collector |
 | :--- | :--- | :--- | :--- | :--- |
-| **?몄뒪???섍꼍** | **Cloudflare Pages (GitHub Actions CI/CD ?먮룞 諛고룷)** | **濡쒖뺄 PC (Cloudflare Tunnel)** | **濡쒖뺄 PC (Cloudflare Tunnel)** | **濡쒖뺄 PC (諛깃렇?쇱슫??** |
-| **怨듦컻 ?묒냽 ?꾨찓??* | `https://wavit-studio.com` | `https://schedule.wavit-studio.com` | `https://virtualindex.wavit-studio.com` | *(?대? 諛깃렇?쇱슫???뚯빱)* |
-| **濡쒖뺄 ?ы듃** | *(?쒕쾭由ъ뒪 - 濡쒖뺄 ?먯쑀 ?놁쓬)* | `3000` | `3001` | `3001` (?源??몄텧) |
-| **愿由??꾨줈?몄뒪** | Cloudflare Edge Global CDN | ?ㅼ?以꾨윭: `Schedule_Server` / PM2: `schedule-web` (ID: 0) | ?ㅼ?以꾨윭: `VirtualIndex_Server` / PM2: `virtualindex-server` (ID: 1) | ?ㅼ?以꾨윭: `VirtualIndex_Collector` / PM2: `virtualindex-collector` (ID: 2) |
-| **?꾨줈?앺듃 寃쎈줈 / ?뚯뒪** | GitHub: `WAVYkhy/WAVIT_studio_2` | `C:\apps\schedule` | `C:\Users\wkjne\virtualindex` | `C:\Users\wkjne\virtualindex` |
-| **?꾨젅?꾩썙??/ 援ъ“** | Vanilla HTML/CSS/JS (?뺤쟻 ?? | Next.js 16.2.10 (Node.js v26) | Next.js 16.3.6 (Node.js v26) | Node.js Worker (ESM) |
-| **?뱀씠 ?ы빆** | Nordic Sharp Desktop ?⑥씪 怨좎젙 ?뚮쭏 | `schedule.wavit-studio.com` ?낅┰ 猷⑦듃 留ㅽ븨 (`/schedule` ?묎렐 ???먮룞 301/308 由щ떎?대젆?? | 猷⑦듃 ?쒕툕?꾨찓???⑤룆 留ㅽ븨 | 5遺?媛꾧꺽 ?먮룞 ?쇱씠釉??섏쭛 |
+| **호스팅 환경** | **Cloudflare Pages (GitHub Actions CI/CD 자동 배포)** | **로컬 PC (Cloudflare Tunnel + GitHub Actions 자동 배포)** | **로컬 PC (Cloudflare Tunnel + GitHub Actions 자동 배포)** | **로컬 PC (백그라운드 워커)** |
+| **공개 접속 도메인** | `https://wavit-studio.com` | `https://schedule.wavit-studio.com` | `https://virtualindex.wavit-studio.com` | *(내부 백그라운드 워커)* |
+| **로컬 포트** | *(서버리스 - 로컬 점유 없음)* | `3000` | `3001` | `3001` (로컬 호출) |
+| **관리 프로세스** | Cloudflare Edge Global CDN | 스케줄러: `Schedule_Server`, `Schedule_Runner` / PM2: `schedule-web` (ID: 0) | 스케줄러: `VirtualIndex_Server` / PM2: `virtualindex-server` (ID: 1) | 스케줄러: `VirtualIndex_Collector` / PM2: `virtualindex-collector` (ID: 2) |
+| **프로젝트 경로 / 소스** | GitHub: `WAVYkhy/WAVIT_studio_2` | `C:\apps\schedule` | `C:\Users\wkjne\virtualindex` | `C:\Users\wkjne\virtualindex` |
+| **프레임워크 / 구조** | Vanilla HTML/CSS/JS (정적 웹) | Next.js 16.2.10 (Node.js v26) | Next.js 16.3.6 (Node.js v26) | Node.js Worker (ESM) |
+| **배포 방식** | `main` 푸시 시 Cloudflare Pages 자동 배포 (20~30초) | `main` 푸시 시 Self-hosted Runner 자동 배포 (`deploy-self-hosted.yml`) | `main` 푸시 시 Self-hosted Runner 자동 배포 (`deploy-self-hosted.yml`) | 서비스 재시작 시 자동 반영 |
+| **특이 사항** | Nordic Sharp Desktop 단일 고정 테마 | `schedule.wavit-studio.com` 독립 루트 매핑 (`/schedule` 접근 시 자동 301/308 리다이렉트) | 루트 서브도메인 단독 매핑 | 5분 간격 자동 라이브 수집 |
 
 ---
 
-## 3. ?숋툘 ?ㅽ듃?뚰겕 諛??꾨찓???명봽???뺣낫
+## 3. 🌐 네트워크 및 도메인 인프라 정보
 
-### [?꾨찓??諛?DNS ?뺣낫]
-- **猷⑦듃 ?꾨찓??*: `wavit-studio.com`
-- **?꾨찓???깅줉湲곌?**: Spaceship
-- **?ㅼ엫?쒕쾭(NS)**:
+### [도메인 및 DNS 정보]
+- **루트 도메인**: `wavit-studio.com`
+- **도메인 등록기관**: Spaceship
+- **네임서버(NS)**:
   - `adele.ns.cloudflare.com`
   - `vin.ns.cloudflare.com`
 - **Cloudflare Zone ID**: `023f17403dfe75606f5c10a570677f7e`
 - **Cloudflare Account ID**: `d32c927d04c8c89b6f6a9ba3374cfcaf`
 
-### [Cloudflare Pages (硫붿씤 ?뱀궗?댄듃)]
-- **?꾨줈?앺듃紐?*: `wavit-studio`
-- **湲곕낯 二쇱냼**: `https://wavit-studio.pages.dev`
-- **?꾨줈?뺤뀡 釉뚮옖移?*: `main`
-- **諛고룷 諛⑹떇**: GitHub Actions CI/CD (`.github/workflows/deploy.yml` ??Cloudflare Pages ?먮룞 諛고룷)
-- **而ㅼ뒪? ?꾨찓??*: `wavit-studio.com`, `www.wavit-studio.com`
-- **二쇱슂 援ъ꽦**:
-  - `index.html`: Nordic Sharp OS ?곗뒪?ы넲 ?⑥씪 硫붿씤 ?뚮쭏 ?곸슜
-  - `_redirects`: `/theme_sharp_desktop` ??`/` (301 ?먮룞 ?뺢퇋??
-  - 遺덊븘?뷀븳 援щ쾭???뚮쭏(Brutalist, Editorial, Pastel ?? ?쇨큵 ?뺣━ ?꾨즺
+### [Cloudflare Pages (메인 웹사이트)]
+- **프로젝트명**: `wavit-studio`
+- **기본 주소**: `https://wavit-studio.pages.dev`
+- **프로덕션 브랜치**: `main`
+- **배포 방식**: GitHub Actions CI/CD (`.github/workflows/deploy.yml` ➔ Cloudflare Pages 자동 배포)
+- **커스텀 도메인**: `wavit-studio.com`, `www.wavit-studio.com`
+- **주요 구성**:
+  - `index.html`: Nordic Sharp OS 데스크톱 단일 메인 테마 적용
+  - `_redirects`: `/theme_sharp_desktop` ➔ `/` (301 자동 정규화)
 
-### [Cloudflare Zero Trust Tunnel (濡쒖뺄 ?쒕퉬??]
-- **?곕꼸 ID**: `90a6ff3c-b177-44ba-8bbb-d76928e0bb04`
-- **?곕꼸 ????몄뒪??*: `90a6ff3c-b177-44ba-8bbb-d76928e0bb04.cfargotunnel.com`
-- **?덈룄???쒕퉬?ㅻ챸**: `Cloudflared` (`C:\Program Files (x86)\cloudflared\cloudflared.exe`)
-- **?좏겙 ????뚯씪**: `C:\ProgramData\cloudflared\token`
-- **?곕꼸 ?멸렇?덉뒪(Ingress) ?쇱슦??洹쒖튃**:
-  1. `schedule.wavit-studio.com` ??`http://localhost:3000` (Schedule Tracker ?꾩슜)
-  2. `virtualindex.wavit-studio.com` ??`http://localhost:3001` (VirtualIndex ?꾩슜)
-  3. `*` ??`http_status:404` (湲고? 誘몃벑濡??쒕툕?꾨찓??李⑤떒)
+### [Cloudflare Zero Trust Tunnel (로컬 서비스)]
+- **터널 ID**: `90a6ff3c-b177-44ba-8bbb-d76928e0bb04`
+- **터널 호스트**: `90a6ff3c-b177-44ba-8bbb-d76928e0bb04.cfargotunnel.com`
+- **윈도우 서비스명**: `Cloudflared` (`C:\Program Files (x86)\cloudflared\cloudflared.exe`)
+- **토큰 저장 파일**: `C:\ProgramData\cloudflared\token`
+- **터널 인그레스(Ingress) 라우팅 규칙**:
+  1. `schedule.wavit-studio.com` ➔ `http://localhost:3000` (Schedule Tracker 전용)
+  2. `virtualindex.wavit-studio.com` ➔ `http://localhost:3001` (VirtualIndex 전용)
+  3. `*` ➔ `http_status:404` (기타 미등록 서브도메인 차단)
 
-### [DNS ?덉퐫??留ㅽ븨??
-| Type | Name | Content (Target) | Proxy (援щ쫫) | ?⑸룄 |
+### [DNS 레코드 매핑표]
+| Type | Name | Content (Target) | Proxy (구름) | 용도 |
 | :--- | :--- | :--- | :--- | :--- |
-| **CNAME** | `@` (wavit-studio.com) | `wavit-studio.pages.dev` | ?꾨줉?쒕맖 (耳쒖쭚) | `wavit-studio.com` Cloudflare Pages ?곌껐 |
-| **CNAME** | `www` (www.wavit-studio.com) | `wavit-studio.pages.dev` | ?꾨줉?쒕맖 (耳쒖쭚) | `www.wavit-studio.com` 蹂댁“ ?꾨찓???곌껐 |
-| **CNAME** | `schedule` | `90a6ff3c-b177-44ba-8bbb-d76928e0bb04.cfargotunnel.com` | ?꾨줉?쒕맖 (耳쒖쭚) | `schedule.wavit-studio.com` ?곕꼸 ?쇱슦??|
-| **CNAME** | `virtualindex` | `90a6ff3c-b177-44ba-8bbb-d76928e0bb04.cfargotunnel.com` | ?꾨줉?쒕맖 (耳쒖쭚) | `virtualindex.wavit-studio.com` ?곕꼸 ?쇱슦??|
-| **MX** | `@` | `mx.zoho.com` (?곗꽑?쒖쐞 10) | DNS ?꾩슜 | Zoho Mail 硫붿씤 ?섏떊 ?쒕쾭 |
-| **MX** | `@` | `mx2.zoho.com` (?곗꽑?쒖쐞 20) | DNS ?꾩슜 | Zoho Mail 蹂댁“ ?섏떊 ?쒕쾭 1 |
-| **MX** | `@` | `mx3.zoho.com` (?곗꽑?쒖쐞 50) | DNS ?꾩슜 | Zoho Mail 蹂댁“ ?섏떊 ?쒕쾭 2 |
-| **TXT** | `@` | `v=spf1 include:zoho.com ~all` | DNS ?꾩슜 | ?대찓??諛쒖떊 SPF ?몄쬆 |
-| **TXT** | `zoho._domainkey` | `v=DKIM1; k=rsa; p=MIGfMA0G...` | DNS ?꾩슜 | ?대찓???꾩“ 諛⑹? DKIM ?몄쬆 |
-| **TXT** | `_dmarc` | `v=DMARC1; p=none;` | DNS ?꾩슜 | ?대찓???꾩“ 諛??ㅽ뙵 諛⑹? DMARC ?뺤콉 |
+| **CNAME** | `@` (wavit-studio.com) | `wavit-studio.pages.dev` | 프록시됨 (켜짐) | `wavit-studio.com` Cloudflare Pages 연결 |
+| **CNAME** | `www` (www.wavit-studio.com) | `wavit-studio.pages.dev` | 프록시됨 (켜짐) | `www.wavit-studio.com` 보조 도메인 연결 |
+| **CNAME** | `schedule` | `90a6ff3c-b177-44ba-8bbb-d76928e0bb04.cfargotunnel.com` | 프록시됨 (켜짐) | `schedule.wavit-studio.com` 터널 라우팅 |
+| **CNAME** | `virtualindex` | `90a6ff3c-b177-44ba-8bbb-d76928e0bb04.cfargotunnel.com` | 프록시됨 (켜짐) | `virtualindex.wavit-studio.com` 터널 라우팅 |
+| **MX** | `@` | `mx.zoho.com` (우선순위 10) | DNS 전용 | Zoho Mail 메인 수신 서버 |
+| **MX** | `@` | `mx2.zoho.com` (우선순위 20) | DNS 전용 | Zoho Mail 보조 수신 서버 1 |
+| **MX** | `@` | `mx3.zoho.com` (우선순위 50) | DNS 전용 | Zoho Mail 보조 수신 서버 2 |
+| **TXT** | `@` | `v=spf1 include:zoho.com ~all` | DNS 전용 | 이메일 발신 SPF 인증 |
+| **TXT** | `zoho._domainkey` | `v=DKIM1; k=rsa; p=MIGfMA0G...` | DNS 전용 | 이메일 위조 방지 DKIM 인증 |
+| **TXT** | `_dmarc` | `v=DMARC1; p=none;` | DNS 전용 | 이메일 위조 및 스팸 방지 DMARC 정책 |
 
 ---
 
-## 4. ?썱截??쇱긽 ?댁쁺 諛?愿由?紐낅졊??移섑듃?쒗듃
+## 4. 🛠️ 일상 운영 및 관리 명령 치트시트
 
-### [WAVIT Studio (硫붿씤 ?? 諛고룷 愿由?
-> **GitHub Actions CI/CD ?뚯씠?꾨씪??援ъ텞 ?꾨즺**: `main` 釉뚮옖移섏뿉 肄붾뱶瑜??몄떆?섎㈃ GitHub ?대씪?곕뱶 ?щ꼫媛 ?먮룞?쇰줈 媛먯??섏뿬 **20~30珥???Cloudflare Pages濡?臾댁쨷???먮룞 諛고룷**瑜??섑뻾?⑸땲??
+### [Schedule Tracker (포트 3000) 자동 배포 파이프라인]
+> **GitHub Actions CI/CD 파이프라인 구축 완료**: `main` 브랜치에 코드를 푸시하면 로컬 PC의 Self-hosted Runner(`Schedule_Runner`)가 감지하여 **20~30초 내 `git pull` ➔ `npm run build` ➔ 포트 3000 재시작**을 완전 자동으로 수행합니다.
 
 ```powershell
-# 1. ?먮룞 諛고룷 (GitHub main ?몄떆 ???먮룞?쇰줈 諛고룷 ?꾨즺)
+# 1. 자동 배포 (GitHub main 푸시 시 자동으로 배포 완료)
 git add .
-git commit -m "Update website content"
+git commit -m "feat: 업데이트 내용"
 git push origin main
 
-# 2. 鍮꾩긽 ?섎룞 ?щ같??(GitHub Actions瑜?嫄곗튂吏 ?딄퀬 濡쒖뺄?먯꽌 利됱떆 CLI 諛고룷??寃쎌슦)
-$env:CLOUDFLARE_API_KEY = "<CLOUDFLARE_API_KEY>"
-$env:CLOUDFLARE_EMAIL = "<CLOUDFLARE_EMAIL>"
-$env:CLOUDFLARE_ACCOUNT_ID = "d32c927d04c8c89b6f6a9ba3374cfcaf"
-npx wrangler pages deploy "<?꾨줈?앺듃寃쎈줈>" --project-name "wavit-studio" --branch "main"
+# 2. 러너 상태 및 로그 확인
+Get-ScheduledTask -TaskName "Schedule_Runner"
+Get-Content "C:\apps\actions-runner-schedule\runner.log" -Tail 20
+
+# 3. 비상 수동 서버 재시작
+powershell -ExecutionPolicy Bypass -File "C:\apps\schedule\scripts\start-server.ps1"
 ```
 
-### [Windows ?묒뾽 ?ㅼ?以꾨윭 愿由?(?곸떆 ?쒕퉬??]
+### [Windows 작업 스케줄러 관리 (상시 서비스)]
 ```powershell
-# 1. ?곸떆 ?쒕퉬???곹깭 ?쇨큵 ?뺤씤
-Get-ScheduledTask -TaskName "Schedule_Server", "VirtualIndex_Server", "VirtualIndex_Collector" | Format-Table TaskName, State
+# 1. 상시 서비스 상태 일괄 확인
+Get-ScheduledTask -TaskName "Schedule_Server", "Schedule_Runner", "VirtualIndex_Server", "VirtualIndex_Collector" | Format-Table TaskName, State
 
-# 2. ?뱀젙 ?쒕퉬???ъ떆??Restart-ScheduledTask -TaskName "Schedule_Server"        # ?ㅼ?以???(?ы듃 3000)
-Restart-ScheduledTask -TaskName "VirtualIndex_Server"    # 踰꾩텛?쇱씤?깆뒪 ??(?ы듃 3001)
-Restart-ScheduledTask -TaskName "VirtualIndex_Collector" # 5遺?二쇨린 ?섏쭛湲?
-# 3. ?쒕퉬??濡쒓렇 ?뺤씤
-Get-Content "C:\apps\schedule\server.log" -Tail 20                # ?ㅼ?以꾨윭 濡쒓렇
-Get-Content "C:\Users\wkjne\virtualindex\server.log" -Tail 20    # 踰꾩텛?쇱씤?깆뒪 ?쒕쾭 濡쒓렇
-Get-Content "C:\Users\wkjne\virtualindex\collector.log" -Tail 20 # ?섏쭛湲?濡쒓렇
+# 2. 특정 서비스 재시작
+Restart-ScheduledTask -TaskName "Schedule_Server"        # 스케줄러 웹 (포트 3000)
+Restart-ScheduledTask -TaskName "Schedule_Runner"        # 스케줄러 CI/CD 러너
+Restart-ScheduledTask -TaskName "VirtualIndex_Server"    # 버추얼인덱스 웹 (포트 3001)
+Restart-ScheduledTask -TaskName "VirtualIndex_Collector" # 5분 주기 방송 수집기
+
+# 3. 서비스 로그 확인
+Get-Content "C:\apps\schedule\server.log" -Tail 20                # 스케줄러 웹 로그
+Get-Content "C:\apps\actions-runner-schedule\runner.log" -Tail 20 # 스케줄러 러너 로그
+Get-Content "C:\Users\wkjne\virtualindex\server.log" -Tail 20    # 버추얼인덱스 서버 로그
+Get-Content "C:\Users\wkjne\virtualindex\collector.log" -Tail 20 # 수집기 로그
 ```
 
-### [PM2 濡쒖뺄 ?쒕퉬??愿由?
+### [Cloudflare 터널 서비스 관리]
 ```powershell
-# 1. ?꾩껜 ?쒕퉬??援щ룞 ?곹깭 ?뺤씤
-pm2 status
-
-# 2. ?ㅼ떆媛?濡쒓렇 紐⑤땲?곕쭅
-pm2 logs                       # ?꾩껜 ?꾨줈?몄뒪 濡쒓렇 ?ㅽ듃由щ컢
-pm2 logs schedule-web          # ?ㅼ?以꾨윭 濡쒓렇留??뺤씤
-pm2 logs virtualindex-server   # 踰꾩텛?쇱씤?깆뒪 ?쒕쾭 濡쒓렇留??뺤씤
-pm2 logs virtualindex-collector # ?쇱씠釉??섏쭛湲?濡쒓렇留??뺤씤
-
-# 3. ?쒕퉬???ъ떆??pm2 restart all                # ?꾩껜 ?ъ떆??pm2 restart schedule-web       # ?뱀젙 ?쒕퉬?ㅻ쭔 ?ъ떆??pm2 restart virtualindex-server --update-env # ?섍꼍蹂??媛깆떊?섎ŉ ?ъ떆??
-# 4. ?꾨줈?몄뒪 ?곹깭 ?곴뎄 ???(?щ??????먮룞 蹂듭썝 湲곗???
-pm2 save
-```
-
-### [Cloudflare ?곕꼸 ?쒕퉬??愿由?
-```powershell
-# 1. ?곕꼸 ?쒕퉬???곹깭 ?뺤씤
+# 1. 터널 서비스 상태 확인
 Get-Service cloudflared
 
-# 2. ?곕꼸 ?쒕퉬???ъ떆??(愿由ъ옄 沅뚰븳)
+# 2. 터널 서비스 재시작 (관리자 권한)
 Restart-Service cloudflared
-
-# 3. ?곕꼸 ?쒕퉬??以묒? 諛??쒖옉
-Stop-Service cloudflared
-Start-Service cloudflared
 ```
 
 ---
 
-## 5. ?뮕 ?꾩닔 ?좎?蹂댁닔 ?섏튃
+## 5. ⚠️ 필수 유지보수 수칙
 
-1. **硫붿씤 ?뱀궗?댄듃(wavit-studio.com) ?낅┰ ?댁쁺**:
-   - 硫붿씤 ?뱀궗?댄듃??Cloudflare Pages瑜??듯빐 湲濡쒕쾶 ?ｌ??먯꽌 ?쒕퉬?ㅻ릺誘濡? **濡쒖뺄 ?몄뒪??PC媛 爰쇱졇 ?덉뼱????긽 ?뺤긽 ?묐룞**?⑸땲??
-   - `main` 釉뚮옖移섏뿉 ?몄떆 ??GitHub Actions瑜??듯빐 20~30珥???臾댁쨷???먮룞 諛고룷?⑸땲??
-2. **濡쒖뺄 ?몄뒪??PC(VirtualIndex / Schedule Tracker) 愿由?*:
-   - 濡쒖뺄 PC媛 ?덉쟾 紐⑤뱶???ㅼ뼱媛硫??곕꼸 ?곌껐???딄린誘濡?**?덉쟾 紐⑤뱶??"????**???좎??댁빞 ?⑸땲??
-   - PC ?щ?????`Cloudflared` ?덈룄???쒕퉬?ㅼ? Windows ?묒뾽 ?ㅼ?以꾨윭(`Schedule_Server`, `VirtualIndex_Server`, `VirtualIndex_Collector`)媛 ?먮룞 蹂듭썝?⑸땲??
-3. **?ы듃 異⑸룎 ?꾧툑 ?먯튃 (Port Isolation)**:
-   - `Schedule Tracker`??諛섎뱶??**?ы듃 3000**???ъ슜?댁빞 ?⑸땲??
-   - `VirtualIndex`??諛섎뱶??**?ы듃 3001**???ъ슜?댁빞 ?⑸땲??
-   - 媛쒕퀎 ?ㅽ겕由쏀듃?먯꽌 ?꾩껜 `node.exe` ?꾨줈?몄뒪瑜??쇨큵 媛뺤젣 醫낅즺(`taskkill /F /IM node.exe`)?섎뒗 紐낅졊?대? ?ъ슜?섎㈃ ?ㅻⅨ ?곸떆 ?쒕퉬?ㅺ? ?ㅼ슫?섎?濡??덈? 湲덉??⑸땲??
+1. **메인 웹사이트(wavit-studio.com) 독립 운영**:
+   - 메인 웹사이트는 Cloudflare Pages를 통해 글로벌 엣지에서 서비스되므로, **로컬 호스팅 PC가 꺼져 있어도 항상 정상 작동**합니다.
+   - `main` 브랜치에 푸시 시 GitHub Actions를 통해 20~30초 내 무중단 자동 배포됩니다.
+2. **로컬 호스팅 PC(VirtualIndex / Schedule Tracker) 관리**:
+   - 로컬 PC가 절전 모드에 들어가면 터널 연결이 끊기므로 **절전 모드는 항상 "안 함"**을 유지해야 합니다.
+   - PC 재부팅 시 `Cloudflared` 윈도우 서비스와 Windows 작업 스케줄러(`Schedule_Server`, `Schedule_Runner`, `VirtualIndex_Server`, `VirtualIndex_Collector`)가 자동 복원됩니다.
+3. **포트 충돌 엄금 원칙 (Port Isolation)**:
+   - `Schedule Tracker`는 반드시 **포트 3000**을 사용해야 합니다.
+   - `VirtualIndex`는 반드시 **포트 3001**을 사용해야 합니다.
+   - 개별 스크립트에서 전체 `node.exe` 프로세스를 일괄 강제 종료(`taskkill /F /IM node.exe`)하는 명령어를 사용하면 다른 상시 서비스가 다운되므로 절대 금지합니다.
 
 ---
 
-## 6. ?좑툘 ?μ븷 ????대젰 (Troubleshooting Log)
+## 6. 🚨 장애 및 변경 이력 (Changelog & Troubleshooting Log)
 
-### [2026-11-02] `schedule.wavit-studio.com` ?묒냽 ??VirtualIndex媛 ?몄텧?섎뜕 ?μ븷
-- **?꾩긽**: `https://schedule.wavit-studio.com/` ?묒냽 ???ㅼ?以??섏씠吏媛 ?꾨땶 VirtualIndex 硫붿씤 ?붾㈃??異쒕젰??
-- **?먯씤 遺꾩꽍**:
-  1. **Cloudflare Tunnel Ingress ?ㅼ젙 以묐났**: ?곕꼸 ?ㅼ젙?먯꽌 `virtualindex.wavit-studio.com`怨?`schedule.wavit-studio.com`??紐⑤몢 濡쒖뺄 `http://localhost:3000`?쇰줈 ?쇱슦?낅릺?꾨줉 ?ㅼ젙?섏뼱 ?덉뿀??
-  2. **?ㅽ겕由쏀듃 ?ы듃 異⑸룎**: `VirtualIndex`???쒖옉 ?ㅽ겕由쏀듃(`start-server.bat`)媛 ?ы듃 `3001`???꾨땶 `3000`?쇰줈 ?ㅽ뻾?섎㈃???ы듃 3000???먯쑀?섎뜕 `schedule-web`??媛뺤젣 醫낅즺?섍퀬 3000???좎젏??
-- **?닿껐 議곗튂**:
-  1. Cloudflare API瑜??몄텧?섏뿬 ?곕꼸 Ingress ?쇱슦?낆쓣 ?뺤긽 遺꾨━:
-     - `schedule.wavit-studio.com` ??`http://localhost:3000`
-     - `virtualindex.wavit-studio.com` ??`http://localhost:3001`
-  2. `VirtualIndex`??`start-server.bat`, `restart-service.ps1`, `check-status.ps1`???ы듃 `3001` 湲곗??쇰줈 ?꾨㈃ ?섏젙 諛?臾댁감蹂?`taskkill node.exe` ?쒓굅.
-  3. `C:\apps\schedule\scripts\start-server.bat` 諛?`start-server.vbs` ?앹꽦 ??Windows ?묒뾽 ?ㅼ?以꾨윭 `Schedule_Server`濡??깅줉?섏뿬 3000 ?ы듃 ?곸떆 ?먮룞 ?ㅽ뻾 蹂듦뎄 ?꾨즺.
+### [2026-11-02] Schedule Tracker GitHub Actions Self-hosted Runner 자동 배포 파이프라인 구축
+- **현상/요구사항**: GitHub 저장소(`schedule-tracker`)에 커밋 및 푸시가 발생해도 로컬 호스팅 PC로 자동 동기화/배포가 이루어지지 않아 매번 수동으로 pull 및 build, 재시작을 진행해야 했음.
+- **원인**: Cloudflare Pages와 달리 Schedule Tracker는 사설망 내의 로컬 PC에서 동작하여 GitHub의 push 이벤트를 수신할 CI/CD 에이전트가 없었음.
+- **조치 사항**:
+  1. `C:\apps\actions-runner-schedule`에 GitHub Actions Self-hosted Runner 설치 및 등록 (`schedule-runner`, 라벨: `self-hosted`, `schedule-tracker`).
+  2. Windows 작업 스케줄러에 `Schedule_Runner` 등록 (`scripts/start-runner.vbs`)하여 부팅 시 상시 백그라운드 구동 보장.
+  3. [`.github/workflows/deploy-self-hosted.yml`](file:///c:/apps/schedule/.github/workflows/deploy-self-hosted.yml) 워크플로를 생성하여 `main` 브랜치 푸시 시 자동 `git pull` ➔ `npm run build` ➔ 포트 3000 무중단 재기동 ➔ 헬스체크(HTTP 200) 파이프라인 완성.
+  4. 테스트 검증 완료: 푸시 후 25초 이내에 자동 빌드 및 서비스 재기동 확인.
 
+### [2026-11-02] `schedule.wavit-studio.com` 접속 시 VirtualIndex가 노출되던 장애
+- **현상**: `https://schedule.wavit-studio.com/` 접속 시 스케줄 페이지가 아닌 VirtualIndex 메인 화면이 출력됨.
+- **원인 분석**:
+  1. **Cloudflare Tunnel Ingress 설정 중복**: 터널 설정에서 `virtualindex.wavit-studio.com`과 `schedule.wavit-studio.com`이 모두 로컬 `http://localhost:3000`으로 라우팅되도록 설정되어 있었음.
+  2. **스크립트 포트 충돌**: `VirtualIndex`의 시작 스크립트(`start-server.bat`)가 포트 `3001`이 아닌 `3000`으로 실행되면서 포트 3000을 점유하던 `schedule-web`을 강제 종료하고 3000을 선점함.
+- **해결 조치**:
+  1. Cloudflare API를 호출하여 터널 Ingress 라우팅을 정상 분리:
+     - `schedule.wavit-studio.com` ➔ `http://localhost:3000`
+     - `virtualindex.wavit-studio.com` ➔ `http://localhost:3001`
+  2. `VirtualIndex`의 `start-server.bat`, `restart-service.ps1`, `check-status.ps1`을 포트 `3001` 기준으로 전면 수정 및 무차별 `taskkill node.exe` 제거.
+  3. `C:\apps\schedule\scripts\start-server.bat` 및 `start-server.vbs` 생성 후 Windows 작업 스케줄러 `Schedule_Server`로 등록하여 3000 포트 상시 자동 실행 복구 완료.
+
+### [2026-11-02] 5분 주기 라이브 수집기(VirtualIndex_Collector) 포트 404 오류로 인한 방송 감지 중단 장애
+- **현상**: 대시보드 및 V-Dive에서 실시간 방송 시작/종료 감지가 반영되지 않고 멈춤 현상 발생.
+- **원인 분석**:
+  1. VirtualIndex 웹 서버를 포트 3001로 이전한 후, Windows 작업 스케줄러(`VirtualIndex_Collector`)가 실행하는 백그라운드 수집 스크립트의 호출 대상 URL이 여전히 `http://localhost:3000/api/collector/run`으로 하드코딩되어 있었음.
+  2. 포트 3000은 Schedule-Tracker 전용 서비스이므로 `/api/collector/run` 엔드포인트가 존재하지 않아 매 5분마다 `404 Not Found`가 발생하며 수집이 약 45분간 전면 중단됨.
+- **해결 조치**:
+  1. 수집 스크립트의 대상 포트를 3001로 변경하고 임시 터널 스크립트도 3001로 수정.
+  2. 스케줄러 즉시 실행하여 `[SUCCESS]` 확인 및 41개 라이브 채널 정상 감지 복구 완료.

@@ -6,6 +6,7 @@ on:
       - main
     paths-ignore:
       - 'README.md'
+      - 'HOSTING_GUIDE.md'
       - 'docs/**'
       - '.gitignore'
   workflow_dispatch:
